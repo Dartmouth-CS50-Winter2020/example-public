@@ -1,0 +1,158 @@
+TESTING for subtemplate.c example
+My Name, January 2020
+
+### Test the basic operation of this program, including in a pipeline:
+
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @TITLE@ title.txt 
+<html>
+  <head><title>Fall 2015
+</title></head>
+  <body>
+    <h1>Fall 2015
+</h1>
+    <p>@HEADCAPTION@</p>
+  </body>
+</html>
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @TITLE@ title.txt  | ./subtemplate @HEADCAPTION@ header.txt 
+<html>
+  <head><title>Fall 2015
+</title></head>
+  <body>
+    <h1>Fall 2015
+</h1>
+    <p>Fall colors at Dartmouth, 2015. Photos courtesy of Dartmouth Flickr site.
+</p>
+  </body>
+</html>
+
+
+### Test a simple case where target does not appear in file.
+
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @TIXX header.txt 
+<html>
+  <head><title>@TITLE@</title></head>
+  <body>
+    <h1>@TITLE@</h1>
+    <p>@HEADCAPTION@</p>
+  </body>
+</html>
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @HUH header.txt 
+<html>
+  <head><title>@TITLE@</title></head>
+  <body>
+    <h1>@TITLE@</h1>
+    <p>@HEADCAPTION@</p>
+  </body>
+</html>
+
+
+### Test the parameters - missing file, no parameters, one parameter, more than two params:
+
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @TITLE@ header.not
+./subtemplate: replacement file header.not nonexistent or not readable
+[cs50@flume ~/example]$ cat header.template | ./subtemplate 
+usage: ./subtemplate targetString replacementFilename
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @TITLE@ 
+usage: ./subtemplate targetString replacementFilename
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @TITLE@ title.txt extra
+usage: ./subtemplate targetString replacementFilename
+[cs50@flume ~/example]$ cat header.template | ./subtemplate title.txt @TITLE@
+./subtemplate: replacement file @TITLE@ nonexistent or not readable
+
+
+### Test on a different template
+
+[cs50@flume ~/example]$ cat image.template | ./subtemplate @TITLE@ title.txt 
+<html>
+  <body>
+      <center>
+	<img src="@IMAGEFILE@" width=800>
+	<font size=+2>
+	  <p>@CAPTION@</p> 
+	</font>
+	<p>Date: @DATE@</p>
+	<p>Credit: @CREDIT@</p>
+	<p>Copyright: @COPYRIGHT@</p>
+      </center>
+    </font>
+  </body>
+</html>
+
+
+### Make some special templates to test special cases.
+
+### Template that is wholly a target string:
+
+[cs50@flume ~/example]$ echo @TITLE@ > test.template
+[cs50@flume ~/example]$ cat test.template | ./subtemplate @TITLE@ title.txt 
+Fall 2015
+
+### Template that does not end in a newline
+
+[cs50@flume ~/example]$ echo -n @TITLE@ > test.template
+[cs50@flume ~/example]$ cat test.template
+@TITLE@[cs50@flume ~/exacat test.template | ./subtemplate @TITLE@ title.txt 
+Fall 2015
+
+### Template file that ends in partial target string
+
+[cs50@flume ~/example]$ echo -n @TITLE > test.template
+[cs50@flume ~/example]$ cat test.template | ./subtemplate @TITLE@ title.txt 
+@TITLE[cs50@flume ~/example]$ 
+
+### Substitute for a different target
+
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @HEADCAPTION@ title.txt 
+<html>
+  <head><title>@TITLE@</title></head>
+  <body>
+    <h1>@TITLE@</h1>
+    <p>Fall 2015
+</p>
+  </body>
+</html>
+
+
+### Substitute for the expected target - multi-line text file
+
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @HEADCAPTION@ header.txt 
+<html>
+  <head><title>@TITLE@</title></head>
+  <body>
+    <h1>@TITLE@</h1>
+    <p>Fall colors at Dartmouth, 2015. Photos courtesy of Dartmouth Flickr site.
+</p>
+  </body>
+</html>
+
+### Pipeline again, but reverse order
+
+[cs50@flume ~/example]$ cat header.template | ./subtemplate @HEADCAPTION@ header.txt  | ./subtemplate @TITLE@ title.txt 
+<html>
+  <head><title>Fall 2015
+</title></head>
+  <body>
+    <h1>Fall 2015
+</h1>
+    <p>Fall colors at Dartmouth, 2015. Photos courtesy of Dartmouth Flickr site.
+</p>
+  </body>
+</html>
+
+### Empty stdin
+
+[cs50@flume ~/example]$ cat /dev/null | ./subtemplate @HEADCAPTION@ header.txt  | ./subtemplate @TITLE@ title.txt 
+
+### match at end of the file
+
+[cs50@flume ~/example]$ echo -n partial match at end @TITLE@ > test.template
+[cs50@flume ~/example]$ cat test.template | ./subtemplate @TITLE@ title.txt 
+partial match at end Fall 2015
+
+### partial match at end of the file
+[cs50@flume ~/example]$ echo -n partial match at end @TITLE > test.template
+[cs50@flume ~/example]$ cat test.template | ./subtemplate @TITLE@ title.txt 
+partial match at end @TITLE[cs50@flume ~/example]$ 
+[cs50@flume ~/example]$ exit
+logout
+Connection to flume closed.

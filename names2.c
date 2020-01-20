@@ -7,7 +7,7 @@
  * stdin: used if filename not specified
  * stdout: numbered list of names, one per line
  * 
- * David Kotz, April 2016, 2017
+ * CS50, January 2020
  */
 
 #include <stdio.h>

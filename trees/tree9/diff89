@@ -1,0 +1,159 @@
+diff tree8/.gitignore tree9/.gitignore
+1a2
+> stocks
+diff tree8/.gitignore~ tree9/.gitignore~
+1,3c1
+< *.dSYM
+< treetest
+< treetest
+---
+> stocks
+diff tree8/Makefile tree9/Makefile
+2c2,3
+< #  (added memory module, -DTESTING for tree.c)
+---
+> #  (added targets for 'make test' and 'make stocks')
+> #  (added readlinep.o and readlinep.h)
+9c10
+< OBJS = treetest.o tree.o memory.o
+---
+> OBJS = treetest.o tree.o memory.o readlinep.o
+15c16
+< treetest.o: tree.h
+---
+> treetest.o: tree.h readlinep.h
+17a19,25
+> readlinep.o: readlinep.h
+> 
+> test: $(PROG) stocks
+> 	./$(PROG) < stocks
+> 
+> stocks:
+> 	 curl 'http://download.finance.yahoo.com/d/quotes.csv?s=NKE,AAPL,MCD,TWTR,IBM,YHOO,ORCL,GOOG,MSFT,NFLX,FB&f=spl1v&e=.csv' > stocks
+23a32
+> 	rm -f stocks
+Only in tree9: readlinep.c
+Only in tree9: readlinep.h
+diff tree8/treetest.c tree9/treetest.c
+3c3,14
+<  *   (not a very good test program)
+---
+>  *   (interesting item, print/delete functions, and malloc/free tracking)
+>  *
+>  * usage:
+>  *   read stock quotes from stdin to use as test item.
+>  * each line should be comma-separated values, with 
+>  *  "symbol",close,price,volume
+>  * where close and price are floats and volume is an int.
+>  * for example, pipe the output of curl into this program:
+>  *  curl 'http://download.finance.yahoo.com/d/quotes.csv?s=AAPL,GOOG,MSFT,FB&f=spl1v&e=.csv' | ./treetest
+>  * Old documentation about that API:
+>  *  http://www.financialwisdomforum.org/gummy-stuff/Yahoo-data.htm
+>  *  http://www.marketindex.com.au/yahoo-finance-api
+9a21
+> #include <string.h>
+10a23
+> #include "readlinep.h"
+12c25,33
+< void myprint(FILE *fp, const char *key, void *string);
+---
+> struct stock {
+>   float close;		      // previous close
+>   float price;		      // last trade price
+>   int volume;		      // trading volume
+> };
+> 
+> static void stockprint(FILE *fp, const char *key, void *item);
+> static void stockdelete(void *item);
+> static int stockcount = 0;
+17d37
+<   char datastring[] = "Test data";
+25,43c45,77
+<   // some simple test code
+<   tree_insert(tree, "charlene", datastring);
+<   tree_insert(tree, "hillary", datastring);
+<   tree_insert(tree, "irina", datastring);
+<   tree_insert(tree, "alice", datastring);
+<   tree_insert(tree, "eve", datastring);
+<   tree_insert(tree, "bob", datastring);
+<   tree_insert(tree, "david", datastring);
+<   tree_insert(tree, "fred", datastring);
+<   tree_insert(tree, "george", datastring);
+<   tree_insert(NULL, 0, datastring); // should be ignored
+< 
+<   printf("find %s returns %s\n", "irina", (char*) tree_find(tree, "irina"));
+<   printf("find %s returns %s\n", "eve", (char*) tree_find(tree, "eve"));
+< 
+<   printf("update node %s...\n", "eve");
+<   tree_insert(tree, "eve", "new string");
+<   printf("find %s returns %s\n", "eve", (char*) tree_find(tree, "eve"));
+<   printf("find null returns %s\n", (char*) tree_find(NULL, "eve"));
+---
+>   printf("\ntesting tree_insert:\n");
+>   // read stocks from stdin and insert each into the tree
+>   while (!feof(stdin)) {
+>     struct stock *stp = malloc(sizeof(struct stock));
+> 
+>     if (stp == NULL) {
+>       printf("out of memory for stocks\n");
+>     } else {
+>       // parsing the input line, each with format:
+>       // "symbol",low,high,volume
+>       char symbol[8];
+>       char *line = readlinep();
+>       if (line != NULL) {
+> 	sscanf(line, "\"%[^\"]\",%f,%f,%d", symbol, &stp->close, &stp->price, &stp->volume);
+> 	printf("%s,%f,%f,%d\n", symbol, stp->close, stp->price, stp->volume);
+> 	tree_insert(tree, symbol, stp);
+> 	stockcount++;
+> 	free(line);
+>       } else {
+> 	free(stp);
+>       }
+>     }
+>   }
+> 
+>   printf("\ntesting tree_find:\n");
+>   stockprint(stdout, "IBM", tree_find(tree, "IBM")); putchar('\n');
+>   stockprint(stdout, "NKE", tree_find(tree, "NKE")); putchar('\n');
+>   stockprint(stdout, "YHOO", tree_find(tree, "YHOO")); putchar('\n');
+> 
+>   printf("update node %s...\n", "YHOO");
+>   tree_insert(tree, "YHOO", NULL); // this will leak memory
+>   printf("update tree_find(%s):\n", "YHOO");
+>   stockprint(stdout, "YHOO", tree_find(tree, "YHOO")); putchar('\n');
+46c80
+<   tree_print(tree, stdout, myprint);
+---
+>   tree_print(tree, stdout, stockprint);
+49,50c83,97
+<   tree_delete(tree, NULL);
+<   printf("done\n");
+---
+>   tree_delete(tree, stockdelete);
+>   printf("done, with %d stocks still allocated\n", stockcount);
+> }
+> 
+> /* print the given item to the given file.
+>  * in our test, key is the same as item->symbol
+>  */
+> static void stockprint(FILE *fp, const char *key, void *item)
+> {
+>   struct stock *stp = item;
+>   if (stp == NULL)
+>     fprintf(fp, "[%s]: (null)", key);
+>   else 
+>     fprintf(fp, "[%s]: close %f, price %f, vol %d", 
+> 	    key, stp->close, stp->price, stp->volume);
+53,54c100
+< /* print the given string to the given file */
+< void myprint(FILE *fp, const char *key, void *string)
+---
+> static void stockdelete(void *item)
+56c102,105
+<   fprintf(fp, "[%s]: '%s'", key, (char*)string);
+---
+>   if (item) {
+>     free(item);
+>   }
+>   stockcount--;
