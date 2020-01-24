@@ -1,0 +1,106 @@
+diff tree5/tree.c tree6/tree.c
+3c3
+<  *  (version 5: keyed by a string instead of int)
+---
+>  *  (version 6: introduce function pointer)
+24c24
+<   struct treenode *root;
+---
+>   struct treenode *root;                     // root of the tree
+36a37,39
+> static void tree_print_helper(tree_t *tree, treenode_t *node, int depth, 
+> 			      FILE *fp, 
+> 			      void (*itemprint)(FILE *fp, const char *key, void *data) );
+43c46
+<   
+---
+> 
+61c64
+<     
+---
+> 
+146a150,184
+> /**************** tree_print() ****************/
+> void
+> tree_print(tree_t *tree, FILE *fp, 
+> 	   void (*itemprint)(FILE *fp, const char *key, void *data) )
+> {
+>   if (tree != NULL) {
+>     tree_print_helper(tree, tree->root, 0, fp, itemprint);
+>   }
+> }
+> 
+> /**************** tree_print_helper() ****************/
+> /* Recursive function to print nodes of the tree, 
+>  * return data for the found node, or NULL if not found.
+>  */
+> static void  // not visible outside this file
+> tree_print_helper(tree_t *tree, treenode_t *node, int depth, FILE *fp, 
+> 		  void (*itemprint)(FILE *fp, const char *key, void *data) )
+> {
+>   if (node != NULL) {
+>     // print the left subtree
+>     tree_print_helper(tree, node->left, depth+1, fp, itemprint);
+>     
+>     // print the current node
+>     fprintf(fp, "%*s", depth+1, " ");	// indent one space per depth
+>     if (itemprint != NULL) {		// print the node
+>       (*itemprint)(fp, node->key, node->data); 
+>     }
+>     fputc('\n', fp);			// print a newline
+> 
+>     // print the right subtree
+>     tree_print_helper(tree, node->right, depth+1, fp, itemprint);
+>   }
+>   return;
+> }
+> 
+diff tree5/tree.h tree6/tree.h
+3c3
+<  *  (version 5: keyed by a string instead of int)
+---
+>  *  (version 6: introduce function pointer)
+16,18c16
+< /* Create a new (empty) tree;
+<  * return NULL if error.
+<  */
+---
+> /* Create a new (empty) tree; return NULL if error. */
+31a30,35
+> /* Print the whole tree, recursively.
+>  * Provide a function that will print an item.
+>  */
+> void tree_print(tree_t *tree, FILE *fp, 
+> 		void (*itemprint)(FILE *fp, const char *key, void *data) );
+> 
+diff tree5/treetest.c tree6/treetest.c
+11a12,13
+> void myprint(FILE *fp, const char *key, void *string);
+> 
+24d25
+<   tree_insert(tree, "alice", datastring);
+27a29
+>   tree_insert(tree, "alice", datastring);
+35,36c37,38
+<   printf("find %s returns %s\n", "irina", tree_find(tree, "irina"));
+<   printf("find %s returns %s\n", "eve", tree_find(tree, "eve"));
+---
+>   printf("find %s returns %s\n", "irina", (char*) tree_find(tree, "irina"));
+>   printf("find %s returns %s\n", "eve", (char*) tree_find(tree, "eve"));
+40,41c42,46
+<   printf("find %s returns %s\n", "eve", tree_find(tree, "eve"));
+<   printf("find null returns %s\n", tree_find(NULL, "eve"));
+---
+>   printf("find %s returns %s\n", "eve", (char*) tree_find(tree, "eve"));
+>   printf("find null returns %s\n", (char*) tree_find(NULL, "eve"));
+>   
+>   printf("\nThe tree:\n");
+>   tree_print(tree, stdout, myprint);
+42a48,54
+> 
+> /* print the given string to the given file */
+> void myprint(FILE *fp, const char *key, void *string)
+> {
+>   fprintf(fp, "[%s]: '%s'", key, (char*)string);
+> }
+> 

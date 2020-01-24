@@ -1,0 +1,138 @@
+diff tree4/tree.c tree5/tree.c
+3c3
+<  *  (version 4: separating the 'tree' struct from the 'treenode' struct)
+---
+>  *  (version 5: keyed by a string instead of int)
+9a10
+> #include <string.h>
+16c17
+<   int key;		           // search key for this item
+---
+>   char *key;		           // search key for this item
+33,35c34,36
+< 				      const int key, void *data);
+< static treenode_t *treenode_new(const int key, void *data);
+< static void *tree_find_helper(treenode_t *node, const int key);
+---
+> 				      const char *key, void *data);
+> static treenode_t *treenode_new(const char *key, void *data);
+> static void *tree_find_helper(treenode_t *node, const char *key);
+54c55
+< tree_insert(tree_t *tree, const int key, void *data)
+---
+> tree_insert(tree_t *tree, const char *key, void *data)
+67c68
+< tree_insert_helper(treenode_t *node, const int key, void *data)
+---
+> tree_insert_helper(treenode_t *node, const char *key, void *data)
+72c73
+<   } else if (key == node->key) {
+---
+>   } else if (strcmp(key, node->key) == 0) {
+79c80
+<     if (key < node->key) {
+---
+>     if (strcmp(key, node->key) < 0) {
+91c92
+< treenode_new(const int key, void *data)
+---
+> treenode_new(const char *key, void *data)
+95a97
+>     // error allocating memory for node; return error
+98,102c100,112
+<     node->key = key;
+<     node->data = data;
+<     node->left = NULL;
+<     node->right = NULL;
+<     return node;
+---
+>     node->key = malloc(strlen(key)+1);
+>     if (node->key == NULL) {
+>       // error allocating memory for key; 
+>       // cleanup and return error
+>       free(node);
+>       return NULL;
+>     } else {
+>       strcpy(node->key, key);
+>       node->data = data;
+>       node->left = NULL;
+>       node->right = NULL;
+>       return node;
+>     }
+108c118
+< tree_find(tree_t *tree, const int key)
+---
+> tree_find(tree_t *tree, const char *key)
+122c132
+< tree_find_helper(treenode_t *node, const int key)
+---
+> tree_find_helper(treenode_t *node, const char *key)
+126c136
+<   } else if (key == node->key) {
+---
+>   } else if (strcmp(key, node->key) == 0) {
+129c139
+<     if (key < node->key) {
+---
+>     if (strcmp(key, node->key) < 0) {
+diff tree4/tree.h tree5/tree.h
+3c3
+<  *  (version 4: separate tree from treenode)
+---
+>  *  (version 5: keyed by a string instead of int)
+22a23
+>  * The key string is copied for use by the tree.
+24c25
+< void tree_insert(tree_t *tree, const int key, void *data);
+---
+> void tree_insert(tree_t *tree, const char *key, void *data);
+29c30
+< void *tree_find(tree_t *tree, const int key);
+---
+> void *tree_find(tree_t *tree, const char *key);
+diff tree4/treetest.c tree5/treetest.c
+4c4
+<  * 
+---
+>  *
+17a18,21
+>   if (tree == NULL) {
+>     printf("tree_new failed\n");
+>     exit(1);
+>   }
+20,28c24,32
+<   tree_insert(tree, 3, datastring);
+<   tree_insert(tree, 4, datastring);
+<   tree_insert(tree, 1, datastring);
+<   tree_insert(tree, 5, datastring);
+<   tree_insert(tree, 6, datastring);
+<   tree_insert(tree, 2, datastring);
+<   tree_insert(tree, 8, datastring);
+<   tree_insert(tree, 7, datastring);
+<   tree_insert(tree, 0, datastring);
+---
+>   tree_insert(tree, "alice", datastring);
+>   tree_insert(tree, "charlene", datastring);
+>   tree_insert(tree, "hillary", datastring);
+>   tree_insert(tree, "irina", datastring);
+>   tree_insert(tree, "eve", datastring);
+>   tree_insert(tree, "bob", datastring);
+>   tree_insert(tree, "david", datastring);
+>   tree_insert(tree, "fred", datastring);
+>   tree_insert(tree, "george", datastring);
+31,32c35,36
+<   printf("find %d returns %s\n", 4, tree_find(tree, 4));
+<   printf("find %d returns %s\n", 5, tree_find(tree, 5));
+---
+>   printf("find %s returns %s\n", "irina", tree_find(tree, "irina"));
+>   printf("find %s returns %s\n", "eve", tree_find(tree, "eve"));
+34,37c38,41
+<   printf("update node %d...\n", 5);
+<   tree_insert(tree, 5, "new string");
+<   printf("find %d returns %s\n", 5, tree_find(tree, 5));
+<   printf("find null returns %s\n", tree_find(NULL, 5));
+---
+>   printf("update node %s...\n", "eve");
+>   tree_insert(tree, "eve", "new string");
+>   printf("find %s returns %s\n", "eve", tree_find(tree, "eve"));
+>   printf("find null returns %s\n", tree_find(NULL, "eve"));
