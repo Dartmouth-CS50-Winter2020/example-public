@@ -1,3 +1,11 @@
 # Ignore the future directory
 future/
 random/
+
+#MacOS System Files
+.DS_Store
+Icon?
+
+#Ignore .o files
+*.o
+
