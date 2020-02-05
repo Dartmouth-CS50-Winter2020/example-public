@@ -3,6 +3,7 @@
  * of any length, and return a pointer to a null-terminated string.
  *
  * David Kotz, April 2017
+ * CS 50, 2020
  */
 
 #ifndef __READLINEP_H__

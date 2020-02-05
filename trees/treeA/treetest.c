@@ -14,6 +14,7 @@
  *  http://www.marketindex.com.au/yahoo-finance-api
  *
  * David Kotz - April 2016, 2017
+ * updated by Temi Prioleau, 2020
  */
 
 #include <stdio.h>

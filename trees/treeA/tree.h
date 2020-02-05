@@ -3,6 +3,7 @@
  *  (unit tests)
  *
  * David Kotz - April 2016, 2017
+ * updated by Temi Prioleau, 2020
  */
 
 #ifndef __TREE_H

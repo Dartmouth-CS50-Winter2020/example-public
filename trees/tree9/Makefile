@@ -3,6 +3,7 @@
 #  (added readlinep.o and readlinep.h)
 #
 # David Kotz - April 2016, 2017
+# CS 50 - 2020
 
 CC = gcc
 CFLAGS = -Wall -pedantic -std=c11 -ggdb -DTESTING

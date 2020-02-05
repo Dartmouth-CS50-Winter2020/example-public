@@ -3,6 +3,7 @@
 #
 # David Kotz - May 2016, April 2017
 # updated by Xia Zhou, July 2016
+# updated by Temi Prioleau, 2020
 
 CC = gcc
 CFLAGS = -Wall -pedantic -std=c11 -ggdb # -DTESTING

@@ -2,6 +2,7 @@
  * unittest.h - some useful MACROS for controlling unit tests.
  *
  * David Kotz, May 2016
+ * CS 50, 2020
  *
  * This code, and the code that uses them, would likely be enclosed in
  *  #ifdef UNIT_TEST ... #endif

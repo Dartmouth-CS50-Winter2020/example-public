@@ -3,6 +3,7 @@
  *  (version A: unit testing)
  *
  * David Kotz, April-May 2016, April 2017
+ * updated by Temi Prioleau, 2020
  */
 
 #include <stdio.h>

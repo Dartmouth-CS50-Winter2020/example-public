@@ -9,6 +9,7 @@
  *    if NULL occurs, kick out an error and die.
  *
  * David Kotz, April 2016, 2017
+ * CS 50, 2020
  */
 
 #ifndef __MEMORY_H
