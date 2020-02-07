@@ -21,8 +21,8 @@ readlinep.o: readlinep.h
 
 .PHONY: test unittest unit clean
 
-test: $(PROG) stocks
-	./$(PROG) < stocks
+test: $(PROG)
+	./$(PROG)
 
 unittest: tree.h tree.c memory.h unittest.h memory.o
 	$(CC) $(CFLAGS) -DUNIT_TEST tree.c memory.o -o unittest
@@ -30,13 +30,10 @@ unittest: tree.h tree.c memory.h unittest.h memory.o
 unit:	unittest
 	./unittest
 
-stocks:
-	 curl 'http://download.finance.yahoo.com/d/quotes.csv?s=NKE,AAPL,MCD,TWTR,IBM,YHOO,ORCL,GOOG,MSFT,NFLX,FB&f=spl1v&e=.csv' > stocks
 
 clean:
 	rm -f *~
 	rm -f *.o
 	rm -rf *.dSYM
 	rm -f $(PROG)
-	rm -f stocks
 	rm -f unittest

@@ -21,15 +21,11 @@ readlinep.o: readlinep.h
 
 .PHONY: test clean
 
-test: $(PROG) stocks
-	./$(PROG) < stocks
-
-stocks:
-	 curl 'http://download.finance.yahoo.com/d/quotes.csv?s=NKE,AAPL,MCD,TWTR,IBM,YHOO,ORCL,GOOG,MSFT,NFLX,FB&f=spl1v&e=.csv' > stocks
+test: $(PROG)
+	./$(PROG)
 
 clean:
 	rm -f *~
 	rm -f *.o
 	rm -rf $(PROG).dSYM
 	rm -f $(PROG)
-	rm -f stocks

@@ -248,7 +248,7 @@ int test_newtree0()
   EXPECT(tree_find(tree, "hello") == NULL);
 
   tree_delete(tree, NULL);
-  EXPECT(count_net() == 0);
+  EXPECT(count_net() == 0); //count_net is a func from memory.h
 
   END_TEST_CASE;
   return TEST_RESULT;
@@ -273,7 +273,7 @@ int test_newtree1()
   EXPECT(tree_find(tree, "hello") == NULL);
 
   tree_delete(tree, NULL);
-  EXPECT(count_net() == 0);
+  EXPECT(count_net() == 0); //count_net is a func from memory.h
   END_TEST_CASE;
   return TEST_RESULT;
 }
@@ -310,7 +310,7 @@ int test_treeleft()
   EXPECT(tree_find(tree, "e") == NULL);
 
   tree_delete(tree, NULL);
-  EXPECT(count_net() == 0);
+  EXPECT(count_net() == 0); //count_net is a func from memory.h
   END_TEST_CASE;
   return TEST_RESULT;
 }
@@ -343,7 +343,7 @@ int test_treefind()
   tree_print(tree, stdout, test_dataprint);
 
   tree_delete(tree, NULL);
-  EXPECT(count_net() == 0);
+  EXPECT(count_net() == 0); //count_net is a func from memory.h
   END_TEST_CASE;
   return TEST_RESULT;
 }
