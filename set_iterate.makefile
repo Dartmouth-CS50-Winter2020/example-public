@@ -4,6 +4,7 @@
 #  make -f set_iterate.makefile
 # 
 # David Kotz, May 2017
+# Updated by Temi Prioleau, 2020
 
 # our standard library
 L = libcs50
