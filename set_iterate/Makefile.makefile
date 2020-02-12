@@ -16,6 +16,9 @@ MAKE = make
 # Build both examples
 all: set_iterate1 set_iterate2
 
+# Note: Automatic variables
+# $^ means the names of all dependencies
+# $@ means the target file name
 set_iterate1: set_iterate1.o $L/libcs50.a
 	$(CC) $(CFLAGS) $^ -o $@
 
