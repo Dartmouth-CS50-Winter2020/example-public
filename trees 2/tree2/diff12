@@ -1,0 +1,59 @@
+diff tree1/tree.c tree2/tree.c
+3c3
+<  *  (store integer data with an integer key)
+---
+>  *  (introduces typedef)
+5a6
+>  * Xia Zhou, July 2016
+17c18
+< struct treenode {
+---
+> typedef struct treenode {
+21c22
+< };
+---
+> } tree_t;
+29c30
+< struct treenode *
+---
+> tree_t *
+32c33
+<   struct treenode *node = malloc(sizeof(struct treenode));
+---
+>   tree_t *node = malloc(sizeof(tree_t));
+53,54c54,55
+< struct treenode *
+< tree_insert(struct treenode *node, const int key, const int data)
+---
+> tree_t *
+> tree_insert(tree_t *node, const int key, const int data)
+80c81
+< tree_find(struct treenode *node, const int key)
+---
+> tree_find(tree_t *node, const int key)
+diff tree1/tree.h tree2/tree.h
+3c3
+<  *  (store integer data with an integer key)
+---
+>  *  (introduces typedef)
+12c12
+< struct treenode;  // opaque to users of the module
+---
+> typedef struct treenode tree_t;  // opaque to users of the module
+19c19
+< struct treenode *tree_new(const int key, int data);
+---
+> tree_t *tree_new(const int key, int data);
+27c27
+< struct treenode *tree_insert(struct treenode *root, const int key, const int data);
+---
+> tree_t *tree_insert(tree_t *root, const int key, const int data);
+32c32
+< int tree_find(struct treenode *root, const int key);
+---
+> int tree_find(tree_t *root, const int key);
+diff tree1/treetest.c tree2/treetest.c
+17c17
+< struct treenode *root;
+---
+> tree_t *root;
